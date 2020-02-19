@@ -51,7 +51,7 @@ def separate(args):
     os.makedirs(args.out_dir, exist_ok=True)
 
     def write(inputs, filename, sr=args.sample_rate):
-        librosa.output.write_wav(filename, inputs, sr)# norm=True)
+        librosa.output.write_wav(filename, inputs, sr, norm=True)
 
     with torch.no_grad():
         for (i, data) in enumerate(eval_loader):

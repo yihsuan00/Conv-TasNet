@@ -29,7 +29,8 @@ parser.add_argument('--sample_rate', default=8000, type=int,
                     help='Sample rate')
 parser.add_argument('--batch_size', default=1, type=int,
                     help='Batch size')
-parser.add_argument('--pit', dest = 'pit', default=False, action = 'store_true')
+parser.add_argument('--pit', dest='pit', default=False, action='store_true',
+		    help='whether to use pit during evaluating')
 
 def evaluate(args):
     total_SISNRi = 0

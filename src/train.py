@@ -61,7 +61,8 @@ parser.add_argument('--early_stop', dest='early_stop', default=0, type=int,
                     help='Early stop training when no improvement for 10 epochs')
 parser.add_argument('--max_norm', default=5, type=float,
                     help='Gradient norm threshold to clip')
-parser.add_argument('--pit', action = 'store_true')
+parser.add_argument('--pit', action='store_true', help='whether to use pit during training')
+
 # minibatch
 parser.add_argument('--shuffle', default=0, type=int,
                     help='reshuffle the data at every epoch')

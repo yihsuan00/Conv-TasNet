@@ -1,5 +1,9 @@
 #!/bin/bash
-
+#PBS -l select=2:ncpus=8:ngpus=1
+#PBS -q v100
+PBS_O_WORKDIR="/home/eegroup/eetest23/TEST/Conv-TasNet/egs/wsj0"
+cd $PBS_O_WORKDIR
+module load cuda/cuda-9.0/x86_64
 # Created on 2018/12
 # Author: Kaituo XU
 
@@ -8,10 +12,10 @@
 # * If you jsut have origin sphere format wsj0 , modify `wsj0_origin` to your path and
 # modify `wsj0_wav` to path that put output wav format wsj0, then read and run stage 1 part.
 # After that, modify `data` and run from stage 2.
-wsj0_origin=/home/ktxu/workspace/data/CSR-I-WSJ0-LDC93S6A
-wsj0_wav=/home/ktxu/workspace/data/wsj0-wav/wsj0
-data=/home/ktxu/workspace/data/wsj-mix/2speakers/wav8k/min/
-stage=1  # Modify this to control to start from which stage
+# wsj0_origin=/home/ktxu/workspace/data/CSR-I-WSJ0-LDC93S6A
+# wsj0_wav=/home/ktxu/workspace/data/wsj0-wav/wsj0
+data=/home/eegroup/eetest23/TEST/Conv-TasNet/data/only2speaker_tt_small/min
+stage=1 # Modify this to control to start from which stage
 # -- END
 
 dumpdir=data  # directory to put generated json file
@@ -25,13 +29,13 @@ sample_rate=8000
 segment=4  # seconds
 cv_maxlen=6  # seconds
 # Network config
-N=256
-L=20
-B=256
-H=512
+N=128
+L=40
+B=128
+H=256
 P=3
-X=8
-R=4
+X=7
+R=1
 norm_type=gLN
 causal=0
 mask_nonlinear='relu'
@@ -41,12 +45,13 @@ use_cuda=1
 id=0
 epochs=100
 half_lr=1
-early_stop=0
+early_stop=1
 max_norm=5
+pit=True
 # minibatch
 shuffle=1
-batch_size=3
-num_workers=4
+batch_size=30
+num_workers=8
 # optimizer
 optimizer=adam
 lr=1e-3
@@ -56,11 +61,11 @@ l2=0
 checkpoint=0
 continue_from=""
 print_freq=10
-visdom=0
-visdom_epoch=0
+visdom=1
+visdom_epoch=1
 visdom_id="Conv-TasNet Training"
 # evaluate
-ev_use_cuda=0
+ev_use_cuda=1
 cal_sdr=1
 # -- END Conv-TasNet Config
 
@@ -73,6 +78,11 @@ ngpu=1  # always 1
 . ./cmd.sh
 . ./path.sh
 
+if [ $pit -le 0 ]; then 
+  pit_command=''
+else
+  pit_command='--pit'
+fi
 
 if [ $stage -le 0 ]; then
   echo "Stage 0: Convert sphere format to wav format and generate mixture"
@@ -100,13 +110,15 @@ fi
 
 
 if [ -z ${tag} ]; then
-  expdir=exp/train_r${sample_rate}_N${N}_L${L}_B${B}_H${H}_P${P}_X${X}_R${R}_C${C}_${norm_type}_causal${causal}_${mask_nonlinear}_epoch${epochs}_half${half_lr}_norm${max_norm}_bs${batch_size}_worker${num_workers}_${optimizer}_lr${lr}_mmt${momentum}_l2${l2}_`basename $train_dir`
+  expdir=exp/train_r${sample_rate}_N${N}_L${L}_B${B}_H${H}_P${P}_X${X}_R${R}_C${C}_${norm_type}_causal${causal}_${mask_nonlinear}_epoch${epochs}_half${half_lr}_norm${max_norm}_bs${batch_size}_worker${num_workers}_pit${pit}_${optimizer}_lr${lr}_mmt${momentum}_l2${l2}_`basename $train_dir`
 else
   expdir=exp/train_${tag}
 fi
 
 if [ $stage -le 2 ]; then
   echo "Stage 2: Training"
+  echo "pit"
+  echo $pit
   ${cuda_cmd} --gpu ${ngpu} ${expdir}/train.log \
     CUDA_VISIBLE_DEVICES="$id" \
     train.py \
@@ -144,7 +156,8 @@ if [ $stage -le 2 ]; then
     --print_freq ${print_freq} \
     --visdom $visdom \
     --visdom_epoch $visdom_epoch \
-    --visdom_id "$visdom_id"
+    --visdom_id "$visdom_id" \
+    $pit_command
 fi
 
 
@@ -157,7 +170,8 @@ if [ $stage -le 3 ]; then
     --cal_sdr $cal_sdr \
     --use_cuda $ev_use_cuda \
     --sample_rate $sample_rate \
-    --batch_size $batch_size
+    --batch_size $batch_size \
+    $pit_command
 fi
 
 

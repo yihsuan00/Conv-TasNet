@@ -16,7 +16,6 @@ from pit_criterion import cal_loss
 from conv_tasnet import ConvTasNet
 from utils import remove_pad
 
-
 parser = argparse.ArgumentParser('Evaluate separation performance using Conv-TasNet')
 parser.add_argument('--model_path', type=str, required=True,
                     help='Path to model file created by training')
@@ -30,7 +29,7 @@ parser.add_argument('--sample_rate', default=8000, type=int,
                     help='Sample rate')
 parser.add_argument('--batch_size', default=1, type=int,
                     help='Batch size')
-
+parser.add_argument('--pit', dest = 'pit', default=False, action = 'store_true')
 
 def evaluate(args):
     total_SISNRi = 0
@@ -39,7 +38,6 @@ def evaluate(args):
 
     # Load model
     model = ConvTasNet.load_model(args.model_path)
-    print(model)
     model.eval()
     if args.use_cuda:
         model.cuda()
@@ -60,7 +58,7 @@ def evaluate(args):
             # Forward
             estimate_source = model(padded_mixture)  # [B, C, T]
             loss, max_snr, estimate_source, reorder_estimate_source = \
-                cal_loss(padded_source, estimate_source, mixture_lengths)
+                cal_loss(padded_source, estimate_source, mixture_lengths, args.pit)
             # Remove padding and flat
             mixture = remove_pad(padded_mixture, mixture_lengths)
             source = remove_pad(padded_source, mixture_lengths)
@@ -69,7 +67,6 @@ def evaluate(args):
                                          mixture_lengths)
             # for each utterance
             for mix, src_ref, src_est in zip(mixture, source, estimate_source):
-                print("Utt", total_cnt + 1)
                 # Compute SDRi
                 if args.cal_sdr:
                     avg_SDRi = cal_SDRi(src_ref, src_est, mix)
@@ -144,5 +141,4 @@ def cal_SISNR(ref_sig, out_sig, eps=1e-8):
 
 if __name__ == '__main__':
     args = parser.parse_args()
-    print(args)
     evaluate(args)

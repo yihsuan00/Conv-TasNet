@@ -61,6 +61,7 @@ parser.add_argument('--early_stop', dest='early_stop', default=0, type=int,
                     help='Early stop training when no improvement for 10 epochs')
 parser.add_argument('--max_norm', default=5, type=float,
                     help='Gradient norm threshold to clip')
+parser.add_argument('--pit', action = 'store_true')
 # minibatch
 parser.add_argument('--shuffle', default=0, type=int,
                     help='reshuffle the data at every epoch')
@@ -116,7 +117,6 @@ def main(args):
     model = ConvTasNet(args.N, args.L, args.B, args.H, args.P, args.X, args.R,
                        args.C, norm_type=args.norm_type, causal=args.causal,
                        mask_nonlinear=args.mask_nonlinear)
-    print(model)
     if args.use_cuda:
         model = torch.nn.DataParallel(model)
         model.cuda()
@@ -141,6 +141,5 @@ def main(args):
 
 if __name__ == '__main__':
     args = parser.parse_args()
-    print(args)
     main(args)
 

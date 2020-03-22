@@ -90,7 +90,7 @@ parser.add_argument('--model_path', default='final.pth.tar',
                     help='Location to save best validation model')
 # logging
 parser.add_argument('--print_freq', default=10, type=int,
-                    help='Frequency of printing training infomation')
+                    help='Frequency of printing training information')
 parser.add_argument('--visdom', dest='visdom', type=int, default=0,
                     help='Turn on visdom graphing')
 parser.add_argument('--visdom_epoch', dest='visdom_epoch', type=int, default=0,

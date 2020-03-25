@@ -42,7 +42,7 @@ epochs=100
 half_lr=1
 early_stop=1
 max_norm=5
-pit=True
+pit=
 # minibatch
 shuffle=1
 batch_size=30

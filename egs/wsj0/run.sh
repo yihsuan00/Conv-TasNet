@@ -1,9 +1,4 @@
 #!/bin/bash
-#PBS -l select=2:ncpus=8:ngpus=1
-#PBS -q v100
-PBS_O_WORKDIR="/home/eegroup/eetest23/TEST/Conv-TasNet/egs/wsj0"
-cd $PBS_O_WORKDIR
-module load cuda/cuda-9.0/x86_64
 # Created on 2018/12
 # Author: Kaituo XU
 

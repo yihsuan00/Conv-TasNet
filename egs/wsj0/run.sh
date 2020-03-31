@@ -9,7 +9,7 @@
 # After that, modify `data` and run from stage 2.
 # wsj0_origin=/home/ktxu/workspace/data/CSR-I-WSJ0-LDC93S6A
 # wsj0_wav=/home/ktxu/workspace/data/wsj0-wav/wsj0
-data=/home/eegroup/eetest23/TEST/Conv-TasNet/data/only2speaker_tt_small/min
+data=min
 stage=1 # Modify this to control to start from which stage
 # -- END
 
